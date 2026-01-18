@@ -79,7 +79,7 @@ public class LanguageModel {
         double r = randomGenerator.nextDouble();
 
         for (int i = 0; i < list.getSize(); i++) {
-            if (r <= list.get(i).cp) {
+            if (r < list.get(i).cp) {
                 return list.get(i).chr;
             }
         }
