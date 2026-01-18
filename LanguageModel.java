@@ -36,11 +36,18 @@ public class LanguageModel {
     In in = new In(fileName);
     String window = "";
     char c;
+
+    // בונים חלון ראשון
     for (int i = 0; i < windowLength && in.hasNextChar(); i++) {
-        window += in.readChar();
+        c = in.readChar();
+        if (c == '\r') c = '\n';
+        window += c;
     }
+
+    // מעבדים את הקובץ תו-תו
     while (in.hasNextChar()) {
         c = in.readChar();
+        if (c == '\r') c = '\n';
 
         List probs = CharDataMap.get(window);
         if (probs == null) {
@@ -49,9 +56,9 @@ public class LanguageModel {
         }
 
         probs.update(c);
-
         window = window.substring(1) + c;
     }
+
     for (List probs : CharDataMap.values()) {
         calculateProbabilities(probs);
     }
