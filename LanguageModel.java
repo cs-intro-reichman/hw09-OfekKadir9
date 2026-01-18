@@ -33,32 +33,31 @@ public class LanguageModel {
 
     /** Builds a language model from the text in the given file (the corpus). */
 	public void train(String fileName) {
-    In in = new In(fileName);
-    String window = "";
-    char c;
-    for (int i = 0; i < windowLength && in.hasNextChar(); i++) {
-        c = in.readChar();
-        if (c == '\r') c = '\n';   
-        window += c;
-    }
-    while (in.hasNextChar()) {
-        c = in.readChar();
-        if (c == '\r') c = '\n';   
+        In in = new In(fileName);
 
-        List probs = CharDataMap.get(window);
-        if (probs == null) {
-            probs = new List();
-            CharDataMap.put(window, probs);
+        String text = in.readAll();
+        text = text.replace("\r\n", "\n");
+        text = text.replace('\r', '\n');
+
+        if (text.length() <= windowLength) return;
+
+        for (int i = 0; i + windowLength < text.length(); i++) {
+            String window = text.substring(i, i + windowLength);
+            char c = text.charAt(i + windowLength);
+
+            List probs = CharDataMap.get(window);
+            if (probs == null) {
+                probs = new List();
+                CharDataMap.put(window, probs);
+            }
+
+            probs.update(c);
         }
 
-        probs.update(c);
-        window = window.substring(1) + c;
+        for (List probs : CharDataMap.values()) {
+            calculateProbabilities(probs);
+        }
     }
-
-    for (List probs : CharDataMap.values()) {
-        calculateProbabilities(probs);
-    }
-}
 
     // Computes and sets the probabilities (p and cp fields) of all the
 	// characters in the given list. */
@@ -82,7 +81,7 @@ public class LanguageModel {
         double r = randomGenerator.nextDouble();
 
         for (int i = 0; i < list.getSize(); i++) {
-            if (r < list.get(i).cp) {
+            if (list.get(i).cp > r) {
                 return list.get(i).chr;
             }
         }
@@ -97,26 +96,29 @@ public class LanguageModel {
 	 * @return the generated text
 	 */
 	public String generate(String initialText, int textLength) {
-    if (initialText.length() < windowLength) {
-        return initialText;
-    }
-
-    String result = initialText;
-
-    while (result.length() < textLength) {
-        String window = result.substring(result.length() - windowLength);
-        List probs = CharDataMap.get(window);
-
-        if (probs == null) {
-            break;
+        if (initialText.length() >= textLength) {
+            return initialText.substring(0, textLength);
         }
 
-        char nextChar = getRandomChar(probs);
-        if (nextChar == '\r') nextChar = '\n';  
-        result += nextChar;
-    }
+        if (initialText.length() < windowLength) {
+            return initialText;
+        }
 
-    return result;
+        String result = initialText;
+
+        while (result.length() < textLength) {
+            String window = result.substring(result.length() - windowLength);
+            List probs = CharDataMap.get(window);
+
+            if (probs == null) {
+                break;
+            }
+
+            char nextChar = getRandomChar(probs);
+            result += nextChar;
+        }
+
+        return result;
     }
     /** Returns a string representing the map of this language model. */
 	public String toString() {
