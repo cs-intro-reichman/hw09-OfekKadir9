@@ -36,18 +36,14 @@ public class LanguageModel {
     In in = new In(fileName);
     String window = "";
     char c;
-
-    // בונים חלון ראשון
     for (int i = 0; i < windowLength && in.hasNextChar(); i++) {
         c = in.readChar();
-        if (c == '\r') c = '\n';
+        if (c == '\r') c = '\n';   
         window += c;
     }
-
-    // מעבדים את הקובץ תו-תו
     while (in.hasNextChar()) {
         c = in.readChar();
-        if (c == '\r') c = '\n';
+        if (c == '\r') c = '\n';   
 
         List probs = CharDataMap.get(window);
         if (probs == null) {
@@ -101,25 +97,26 @@ public class LanguageModel {
 	 * @return the generated text
 	 */
 	public String generate(String initialText, int textLength) {
-        if (initialText.length() < windowLength) {
-            return initialText;
+    if (initialText.length() < windowLength) {
+        return initialText;
+    }
+
+    String result = initialText;
+
+    while (result.length() < textLength) {
+        String window = result.substring(result.length() - windowLength);
+        List probs = CharDataMap.get(window);
+
+        if (probs == null) {
+            break;
         }
 
-        String result = initialText;
+        char nextChar = getRandomChar(probs);
+        if (nextChar == '\r') nextChar = '\n';  
+        result += nextChar;
+    }
 
-        while (result.length() < textLength) {
-            String window = result.substring(result.length() - windowLength);
-            List probs = CharDataMap.get(window);
-
-            if (probs == null) {
-                break;
-            }
-
-            char nextChar = getRandomChar(probs);
-            result += nextChar;
-        }
-
-        return result;
+    return result;
     }
     /** Returns a string representing the map of this language model. */
 	public String toString() {
