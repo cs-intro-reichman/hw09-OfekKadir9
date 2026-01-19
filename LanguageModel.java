@@ -36,8 +36,7 @@ public class LanguageModel {
         In in = new In(fileName);
 
         String text = in.readAll();
-        text = text.replace("\r\n", "\n");
-        text = text.replace('\r', '\n');
+        text = text.replace("\r\n", "\n").replace("\r", "");
 
         if (text.length() <= windowLength) return;
 
