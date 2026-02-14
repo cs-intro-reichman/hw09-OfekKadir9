@@ -22,7 +22,7 @@ public class LanguageModel {
         CharDataMap = new HashMap<String, List>();
     }
 
-    /** Constructs a language model with the given window length.
+    /** Constructs a language model with he given window length.
      * Generating texts from this model multiple times will produce
      * different random texts. Good for production. */
     public LanguageModel(int windowLength) {
