@@ -99,7 +99,7 @@ public class LanguageModel {
         }
         String ret = initialText;
         String window = initialText.substring (initialText.length() - windowLength);
-        while (ret.length() < textLength) {
+        while (ret.length() < textLength || ret.charAt (ret.length() -1) != ' ') {
             if (!CharDataMap.containsKey(window)) {
                 return ret;
             }
