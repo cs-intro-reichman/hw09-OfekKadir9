@@ -38,13 +38,16 @@ public class List {
     
     /** GIVE Textual representation of this list. */
     public String toString() {
-        Node current = first;
-        String ret = "( ";
-        while (current != null) {
-            ret = ret + current + " ";
-            current = current.next;
+    Node current = first;
+    String ret = "("; 
+    while (current != null) {
+        ret = ret + current.cp.toString();
+        if (current.next != null) {
+            ret = ret + " "; 
         }
-        return ret + ")";
+        current = current.next;
+    }
+    return ret + ")";
     }
 
     /** Returns the index of the first CharData object in this list
